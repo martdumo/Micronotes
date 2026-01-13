@@ -1,3 +1,5 @@
+#define UNICODE
+#define _UNICODE
 #include <windows.h>
 #include <commctrl.h>
 #include <commdlg.h>
@@ -397,22 +399,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     
                 case IDM_OPEN:
                 {
-                    OPENFILENAME ofn;
-                    TCHAR szFile[MAX_PATH] = {0};
+                    OPENFILENAMEW ofn;
+                    WCHAR szFile[MAX_PATH] = {0};
                     
                     ZeroMemory(&ofn, sizeof(ofn));
                     ofn.lStructSize = sizeof(ofn);
                     ofn.hwndOwner = hwnd;
                     ofn.lpstrFile = szFile;
                     ofn.nMaxFile = MAX_PATH;
-                    ofn.lpstrFilter = TEXT("Archivos de texto\0*.txt\0Todos los archivos\0*.*\0\0");
+                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.c;*.h;*.cpp;*.py;*.js;*.ini;*.bat;*.cmd;*.json;*.md;*.ahk;*.xml;*.log\0All Files (*.*)\0*.*\0\0";
                     ofn.nFilterIndex = 1;
                     ofn.lpstrFileTitle = NULL;
                     ofn.nMaxFileTitle = 0;
                     ofn.lpstrInitialDir = NULL;
                     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
                     
-                    if (GetOpenFileName(&ofn))
+                    if (GetOpenFileNameW(&ofn))
                     {
                         LoadFile(hwnd, ofn.lpstrFile);
                     }
@@ -436,22 +438,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case IDM_SAVEAS:
                 {
                     save_as:
-                    OPENFILENAME ofn;
-                    TCHAR szFile[MAX_PATH] = {0};
+                    OPENFILENAMEW ofn;
+                    WCHAR szFile[MAX_PATH] = {0};
 
                     ZeroMemory(&ofn, sizeof(ofn));
                     ofn.lStructSize = sizeof(ofn);
                     ofn.hwndOwner = hwnd;
                     ofn.lpstrFile = szFile;
                     ofn.nMaxFile = MAX_PATH;
-                    ofn.lpstrFilter = TEXT("Archivos de texto\0*.txt\0Todos los archivos\0*.*\0\0");
+                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.c;*.h;*.cpp;*.py;*.js;*.ini;*.bat;*.cmd;*.json;*.md;*.ahk;*.xml;*.log\0All Files (*.*)\0*.*\0\0";
                     ofn.nFilterIndex = 1;
                     ofn.lpstrFileTitle = NULL;
                     ofn.nMaxFileTitle = 0;
                     ofn.lpstrInitialDir = NULL;
                     ofn.Flags = OFN_OVERWRITEPROMPT;
 
-                    if (GetSaveFileName(&ofn))
+                    if (GetSaveFileNameW(&ofn))
                     {
                         SaveFile(hwnd, ofn.lpstrFile);
                         // Copiar el nombre del archivo para futuras operaciones de guardado
@@ -738,8 +740,9 @@ BOOL LoadFile(HWND hwnd, LPCTSTR pszFileName)
 {
     HANDLE hFile;
     DWORD dwFileSize, dwBytesRead;
-    LPVOID pBuffer;
+    char* pBuffer;
     BOOL bSuccess = FALSE;
+    LPWSTR pwzWide = NULL;
 
     hFile = CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL,
                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -751,51 +754,71 @@ BOOL LoadFile(HWND hwnd, LPCTSTR pszFileName)
     if (dwFileSize == INVALID_FILE_SIZE)
         goto cleanup;
 
-    pBuffer = HeapAlloc(GetProcessHeap(), 0, dwFileSize + 1);
+    pBuffer = (char*)HeapAlloc(GetProcessHeap(), 0, dwFileSize);
     if (!pBuffer)
         goto cleanup;
 
-    if (!ReadFile(hFile, pBuffer, dwFileSize, &dwBytesRead, NULL))
+    if (!ReadFile(hFile, pBuffer, dwFileSize, &dwBytesRead, NULL) || dwFileSize != dwBytesRead)
         goto cleanup_heap;
 
-    // Asegurar terminador nulo
-    ((char*)pBuffer)[dwFileSize] = '\0';
-
-    // Verificar si el archivo tiene BOM UTF-8 (0xEFBBBF)
-    char* textStart = (char*)pBuffer;
+    // Inicia la lógica de "Cascade Conversion"
+    char* textStart = pBuffer;
     DWORD textSize = dwFileSize;
+
+    // 1. Detección de BOM UTF-8
     if (dwFileSize >= 3 && memcmp(pBuffer, "\xEF\xBB\xBF", 3) == 0)
     {
-        // Saltar el BOM UTF-8
-        textStart = (char*)pBuffer + 3;
+        textStart = pBuffer + 3;
         textSize = dwFileSize - 3;
     }
 
-    // Convertir a Unicode si es necesario
-    int cchWide = MultiByteToWideChar(CP_UTF8, 0, textStart, textSize, NULL, 0);
-    if (cchWide == 0)
+    // 2. Intentar convertir de UTF-8 a WideChar
+    int cchWide = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, textStart, textSize, NULL, 0);
+    if (cchWide > 0)
     {
-        // Si la conversión UTF-8 falla, intentar con ANSI
+        pwzWide = (LPWSTR)HeapAlloc(GetProcessHeap(), 0, (cchWide + 1) * sizeof(WCHAR));
+        if (pwzWide)
+        {
+            MultiByteToWideChar(CP_UTF8, 0, textStart, textSize, pwzWide, cchWide);
+            pwzWide[cchWide] = L'\0'; // Asegurar terminador nulo
+        }
+    }
+    else // 3. Si UTF-8 falla, intentar con ANSI (CP_ACP)
+    {
         cchWide = MultiByteToWideChar(CP_ACP, 0, textStart, textSize, NULL, 0);
+        if (cchWide > 0)
+        {
+            pwzWide = (LPWSTR)HeapAlloc(GetProcessHeap(), 0, (cchWide + 1) * sizeof(WCHAR));
+            if (pwzWide)
+            {
+                MultiByteToWideChar(CP_ACP, 0, textStart, textSize, pwzWide, cchWide);
+                pwzWide[cchWide] = L'\0'; // Asegurar terminador nulo
+            }
+        }
     }
 
-    LPWSTR pwzWide = (LPWSTR)HeapAlloc(GetProcessHeap(), 0, (cchWide + 1) * sizeof(WCHAR));
-    if (!pwzWide)
-        goto cleanup_heap;
-
-    if (MultiByteToWideChar(CP_UTF8, 0, textStart, textSize, pwzWide, cchWide) == 0)
+    if (pwzWide)
     {
-        // Si la conversión UTF-8 falla, intentar con ANSI
-        MultiByteToWideChar(CP_ACP, 0, textStart, textSize, pwzWide, cchWide);
+        // 4. Pasar el WCHAR* resultante a SetWindowTextW
+        if (SetWindowTextW(hRichEdit, pwzWide))
+        {
+             bSuccess = TRUE;
+            // Actualizar el archivo actual
+            #ifdef UNICODE
+                wcscpy_s(currentFile, MAX_PATH, pszFileName);
+            #else
+                strcpy_s(currentFile, MAX_PATH, pszFileName);
+            #endif
+        }
+        HeapFree(GetProcessHeap(), 0, pwzWide);
+    }
+    else
+    {
+        // Si ambas conversiones fallan, mostrar un error o limpiar.
+        SetWindowTextW(hRichEdit, L""); // Limpiar editor
+        MessageBoxW(hwnd, L"No se pudo decodificar el archivo. Formato no compatible.", L"Error de Lectura", MB_OK | MB_ICONERROR);
     }
 
-    pwzWide[cchWide] = L'\0'; // Asegurar terminador nulo
-
-    // Establecer texto en el editor
-    SendMessage(hRichEdit, WM_SETTEXT, 0, (LPARAM)pwzWide);
-
-    HeapFree(GetProcessHeap(), 0, pwzWide);
-    bSuccess = TRUE;
 
 cleanup_heap:
     HeapFree(GetProcessHeap(), 0, pBuffer);
