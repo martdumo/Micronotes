@@ -407,7 +407,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ofn.hwndOwner = hwnd;
                     ofn.lpstrFile = szFile;
                     ofn.nMaxFile = MAX_PATH;
-                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.c;*.h;*.cpp;*.py;*.js;*.ini;*.bat;*.cmd;*.json;*.md;*.ahk;*.xml;*.log\0All Files (*.*)\0*.*\0\0";
+                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.md;*.log;*.ini;*.cfg;*.conf;*.json;*.xml;*.yaml;*.toml;*.html;*.css;*.js;*.ts;*.py;*.c;*.h;*.cpp;*.hpp;*.bat;*.cmd;*.ps1;*.sh;*.ahk;*.lua;*.sql;*.env\0"
+                      L"Web Files (*.html;*.css;*.js)\0*.html;*.css;*.js;*.ts;*.php\0"
+                      L"Config Files (*.ini;*.json;*.xml)\0*.ini;*.cfg;*.conf;*.json;*.xml;*.yaml;*.toml;*.env\0"
+                      L"Scripts (*.bat;*.py;*.ps1)\0*.bat;*.cmd;*.ps1;*.sh;*.py;*.ahk;*.lua\0"
+                      L"C/C++ Source (*.c;*.h)\0*.c;*.h;*.cpp;*.hpp\0"
+                      L"All Files (*.*)\0*.*\0\0";
                     ofn.nFilterIndex = 1;
                     ofn.lpstrFileTitle = NULL;
                     ofn.nMaxFileTitle = 0;
@@ -446,7 +451,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ofn.hwndOwner = hwnd;
                     ofn.lpstrFile = szFile;
                     ofn.nMaxFile = MAX_PATH;
-                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.c;*.h;*.cpp;*.py;*.js;*.ini;*.bat;*.cmd;*.json;*.md;*.ahk;*.xml;*.log\0All Files (*.*)\0*.*\0\0";
+                    ofn.lpstrFilter = L"All Supported Files\0*.txt;*.md;*.log;*.ini;*.cfg;*.conf;*.json;*.xml;*.yaml;*.toml;*.html;*.css;*.js;*.ts;*.py;*.c;*.h;*.cpp;*.hpp;*.bat;*.cmd;*.ps1;*.sh;*.ahk;*.lua;*.sql;*.env\0"
+                      L"Web Files (*.html;*.css;*.js)\0*.html;*.css;*.js;*.ts;*.php\0"
+                      L"Config Files (*.ini;*.json;*.xml)\0*.ini;*.cfg;*.conf;*.json;*.xml;*.yaml;*.toml;*.env\0"
+                      L"Scripts (*.bat;*.py;*.ps1)\0*.bat;*.cmd;*.ps1;*.sh;*.py;*.ahk;*.lua\0"
+                      L"C/C++ Source (*.c;*.h)\0*.c;*.h;*.cpp;*.hpp\0"
+                      L"All Files (*.*)\0*.*\0\0";
                     ofn.nFilterIndex = 1;
                     ofn.lpstrFileTitle = NULL;
                     ofn.nMaxFileTitle = 0;

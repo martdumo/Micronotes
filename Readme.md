@@ -11,9 +11,9 @@
 -   **Rendimiento Nativo Puro:** Sin frameworks, sin motores web. Solo la velocidad pura de la API de Win32.
 -   **Modo Oscuro:** Una interfaz de usuario cómoda y con tema oscuro para sesiones de escritura concentradas.
 -   **Funcionalidad Básica del Editor:** Todos los elementos esenciales están aquí:
-    -   Operaciones de archivo: Nuevo, Abrir, Guardar y Guardar como.
+    -   Operaciones de archivo: Nuevo, Abrir (Ctrl + O) y Guardar (Ctrl + S).
     -   Manipulación de texto: Deshacer, Cortar, Copiar, Pegar, Eliminar y Seleccionar todo.
-    -   Funcionalidad de Buscar y Reemplazar.
+    -   Funcionalidad de Buscar y Reemplazar (Ambas con Ctrl + F).
 -   **Personalización de Vista:**
     -   Alternar ajuste de línea (word wrap).
     -   Acercar, alejar y restablecer el zoom al valor predeterminado.
