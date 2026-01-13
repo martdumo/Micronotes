@@ -1,0 +1,84 @@
+﻿#define IDC_STATIC -1
+#include <windows.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include "resource.h"
+
+// Ãcono de la aplicaciÃ³n
+IDI_ICON1 ICON "res\\app.ico"
+
+
+// Definicion de menus
+MAIN_MENU MENU
+{
+    POPUP "&Archivo"
+    {
+        MENUITEM "&Nuevo\tCtrl+N", IDM_NEW
+        MENUITEM "&Abrir...\tCtrl+O", IDM_OPEN
+        MENUITEM "&Guardar\tCtrl+S", IDM_SAVE
+        MENUITEM "Guardar &como...\tCtrl+Shift+S", IDM_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "&Salir", IDM_EXIT
+    }
+    POPUP "&Editar"
+    {
+        MENUITEM "&Deshacer\tCtrl+Z", IDM_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cor&tar\tCtrl+X", IDM_CUT
+        MENUITEM "&Copiar\tCtrl+C", IDM_COPY
+        MENUITEM "&Pegar\tCtrl+V", IDM_PASTE
+        MENUITEM "&Eliminar\tDel", IDM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Seleccionar &todo\tCtrl+A", IDM_SELECTALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Buscar...\tCtrl+F", IDM_FIND
+        MENUITEM "&Reemplazar...", IDM_REPLACE
+    }
+    POPUP "&Ver"
+    {
+        MENUITEM "&Ajustar linea", IDM_WORDWRAP
+        MENUITEM SEPARATOR
+        MENUITEM "Acercar\tCtrl++", IDM_ZOOMIN
+        MENUITEM "Alejar\tCtrl+-", IDM_ZOOMOUT
+        MENUITEM "Restablecer zoom\tCtrl+0", IDM_ZOOMRESET
+    }
+}
+
+// Aceleradores
+IDR_ACCELERATOR1 ACCELERATORS
+BEGIN
+    "O",          IDM_OPEN,        VIRTKEY,        CONTROL
+    "S",          IDM_SAVE,        VIRTKEY,        CONTROL
+    "F",          IDM_FIND,        VIRTKEY,        CONTROL
+    "N",          IDM_NEW,         VIRTKEY,        CONTROL
+    "Z",          IDM_UNDO,        VIRTKEY,        CONTROL
+    "X",          IDM_CUT,         VIRTKEY,        CONTROL
+    "C",          IDM_COPY,        VIRTKEY,        CONTROL
+    "V",          IDM_PASTE,       VIRTKEY,        CONTROL
+    "A",          IDM_SELECTALL,   VIRTKEY,        CONTROL
+    "H",          IDM_REPLACE,     VIRTKEY,        CONTROL
+    VK_ADD,       IDM_ZOOMIN,      VIRTKEY,        CONTROL
+    "=",          IDM_ZOOMIN,      VIRTKEY,        CONTROL
+    "-",          IDM_ZOOMOUT,     VIRTKEY,        CONTROL
+    "0",          IDM_ZOOMRESET,   VIRTKEY,        CONTROL
+END
+
+// Definicion de dialogos
+IDD_FIND_REPLACE DIALOGEX 0, 0, 300, 140
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Buscar y Reemplazar"
+FONT 8, "MS Shell Dlg 2", 400, 0, 0
+BEGIN
+    LTEXT           "&Buscar:", IDC_STATIC, 10, 10, 25, 8
+    EDITTEXT        edt1, 40, 8, 150, 12, ES_AUTOHSCROLL | WS_TABSTOP
+    LTEXT           "&Reemplazar con:", IDC_STATIC, 10, 30, 30, 8
+    EDITTEXT        edt2, 40, 28, 150, 12, ES_AUTOHSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Buscar siguiente", IDOK, 200, 8, 95, 14
+    PUSHBUTTON      "&Reemplazar", IDOK_REPL, 200, 25, 95, 14
+    PUSHBUTTON      "Reemplazar &todo", IDOK_REPL_ALL, 200, 42, 95, 14
+    CONTROL         "Coincidir &may\xFAsculas", IDC_CHK_MATCHCASE, "Button", BS_CHECKBOX | WS_TABSTOP, 40, 45, 70, 10
+    CONTROL         "&Solo palabras completas", IDC_CHK_WHOLEWORDS, "Button", BS_CHECKBOX | WS_TABSTOP, 40, 58, 90, 10
+    CONTROL         "&Buscar hacia atr\xE1s", IDC_CHK_BACKWARD, "Button", BS_CHECKBOX | WS_TABSTOP, 40, 68, 90, 10
+    PUSHBUTTON      "&Cerrar", IDCANCEL, 225, 110, 70, 14
+END
+

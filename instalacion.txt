@@ -1,0 +1,14 @@
+@echo off
+echo Opciones para compilar Micronotes:
+echo.
+echo 1. Instalar Visual Studio Community (GRATIS):
+echo    Descarga desde: https://visualstudio.microsoft.com/vs/community/
+echo    Selecciona durante la instalacion: "Desarrollo de escritorio con C++"
+echo.
+echo 2. Instalar MinGW-w64 (GRATIS):
+echo    Descarga desde: https://www.mingw-w64.org/downloads/
+echo    O via MSYS2: https://www.msys2.org/
+echo.
+echo Despues de instalar uno de estos, puedes ejecutar build.bat nuevamente.
+echo.
+pause
